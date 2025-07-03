@@ -3,10 +3,6 @@ package com.example.rickandmorty.ui.navigation
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
@@ -23,15 +19,20 @@ import androidx.navigation.navArgument
 import com.example.rickandmorty.ui.screens.characters.*
 import com.example.rickandmorty.ui.screens.episodes.*
 import com.example.rickandmorty.ui.screens.locations.*
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AppNavHost() {
-    val navController = rememberAnimatedNavController()
+    val navController = rememberNavController()
 
     val items = listOf(
         Triple(Screen.Characters, "Characters", Icons.Default.Person),
@@ -53,7 +54,7 @@ fun AppNavHost() {
         }
     ) { innerPadding ->
 
-        AnimatedNavHost(
+        NavHost(
             navController = navController,
             startDestination = Screen.Characters.route,
             modifier = Modifier.padding(innerPadding)
@@ -115,10 +116,10 @@ fun BottomNavigationBar(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    BottomNavigation {
+    NavigationBar {
         items.forEach { (screen, label, icon) ->
             val selected = currentRoute?.startsWith(screen.route) == true
-            BottomNavigationItem(
+            NavigationBarItem(
                 icon = { AnimatedIcon(icon, selected) },
                 label = { Text(label) },
                 selected = selected,

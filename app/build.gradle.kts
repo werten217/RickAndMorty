@@ -40,35 +40,50 @@ android {
 }
 
 dependencies {
+// --- Jetpack Compose ---
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation (libs.androidx.core.ktx.v1101)
-    implementation (libs.androidx.lifecycle.runtime.ktx.v261)
-    implementation (libs.androidx.activity.compose.v172)
-    implementation (libs.ui)
-    implementation (libs.material3)
-    implementation (libs.androidx.navigation.compose)
+    // Navigation Compose
+    implementation("androidx.navigation:navigation-compose:2.9.1")
 
-    // Retrofit + Gson
-    implementation (libs.retrofit)
-    implementation (libs.converter.gson)
+    // Accompanist SwipeRefresh (если нужен старый)
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.34.0")
 
-    // OkHttp
-    implementation (libs.logging.interceptor)
-    // Coil
-    implementation (libs.coil.compose)
-    // Koin
-    implementation (libs.koin.android)
-    implementation (libs.koin.androidx.compose)
+    // --- Coroutines ---
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
-    // Coroutines
-    implementation (libs.kotlinx.coroutines.core)
-   // ЧЕ ЗА ХУЙНЯ НЕ РАБОТАЕТ BOTTOMBAR
-    implementation (libs.kotlinx.coroutines.android)
-    implementation (libs.androidx.material3.v111)
-    implementation (libs.androidx.material)// Accompanist Navigation Animation
-    //
-    implementation ("com.google.accompanist:accompanist-navigation-animation:0.30.1")
+    // --- Retrofit + Gson ---
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 
-    // Accompanist SwipeRefresh
-    implementation ("com.google.accompanist:accompanist-swiperefresh:0.30.1")
+    // --- OkHttp ---
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // --- Coil ---
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // --- Koin ---
+    implementation("io.insert-koin:koin-core:3.5.3")
+    implementation("io.insert-koin:koin-android:3.5.3")
+    implementation("io.insert-koin:koin-androidx-compose:3.5.0")
+
+    // --- AndroidX Core + Lifecycle ---
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    // --- Tests ---
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
 }
