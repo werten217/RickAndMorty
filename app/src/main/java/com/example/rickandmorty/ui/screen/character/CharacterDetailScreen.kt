@@ -2,18 +2,19 @@ package com.example.rickandmorty.ui.screens.characters
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.rickandmorty.viewmodel.CharacterViewModel
 import org.koin.androidx.compose.getViewModel
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterDetailScreen(
@@ -21,11 +22,8 @@ fun CharacterDetailScreen(
     characterId: Int,
     viewModel: CharacterViewModel = getViewModel()
 ) {
-    val character by viewModel.characterDetail.collectAsState()
 
-    LaunchedEffect(characterId) {
-        viewModel.fetchCharacterDetail(characterId)
-    }
+    val character by viewModel.getCharacterDetail(characterId).collectAsState()
 
     Column {
         TopAppBar(
@@ -38,18 +36,24 @@ fun CharacterDetailScreen(
         )
 
         if (character == null) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(
+                Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator()
             }
         } else {
             val c = character!!
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
                 Image(
                     painter = rememberAsyncImagePainter(c.image),
                     contentDescription = c.name,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(300.dp)
+                        .clip(CircleShape)
                 )
                 Spacer(Modifier.height(16.dp))
                 Text(c.name, style = MaterialTheme.typography.headlineMedium)

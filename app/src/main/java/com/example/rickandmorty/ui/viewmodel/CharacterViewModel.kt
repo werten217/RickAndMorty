@@ -4,27 +4,38 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.model.Character
 import com.example.rickandmorty.repository.CharacterRepository
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.stateIn
 
-class CharacterViewModel(private val repo: CharacterRepository): ViewModel() {
-    private val _characters = MutableStateFlow<List<Character>>(emptyList())
-    val characters: StateFlow<List<Character>> = _characters
+class CharacterViewModel(private val repo: CharacterRepository) : ViewModel() {
 
-    private val _characterDetail = MutableStateFlow<Character?>(null)
-    val characterDetail: StateFlow<Character?> = _characterDetail
 
-    fun fetchCharacters() {
-        viewModelScope.launch {
+    val characters: StateFlow<List<Character>> =
+        flow {
             val response = repo.getCharacters()
-            _characters.value = response.results
+            emit(response.results)
         }
-    }
+            .flowOn(Dispatchers.IO) // Запуск в фоне
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                initialValue = emptyList()
+            )
 
-    fun fetchCharacterDetail(id: Int) {
-        viewModelScope.launch {
-            _characterDetail.value = repo.getCharacterById(id)
+    // Детали персонажа как Flow
+    fun getCharacterDetail(id: Int): StateFlow<Character?> =
+        flow {
+            val character = repo.getCharacterById(id)
+            emit(character)
         }
-    }
+            .flowOn(Dispatchers.IO)
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                initialValue = null
+            )
 }

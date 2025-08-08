@@ -2,32 +2,25 @@ package com.example.rickandmorty.ui.navigation
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.example.rickandmorty.ui.screens.characters.*
 import com.example.rickandmorty.ui.screens.episodes.*
 import com.example.rickandmorty.ui.screens.locations.*
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Text
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-
+import com.example.rickandmorty.ui.screens.favorite.FavoritesScreen
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -53,7 +46,6 @@ fun AppNavHost() {
             }
         }
     ) { innerPadding ->
-
         NavHost(
             navController = navController,
             startDestination = Screen.Characters.route,
@@ -81,28 +73,52 @@ fun AppNavHost() {
                 CharacterDetailScreen(navController, id)
             }
 
-            composable(Screen.Episodes.route) {
+            composable(
+                route = Screen.Episodes.route,
+                enterTransition = { slideInHorizontally(tween(300)) { it } },
+                exitTransition = { slideOutHorizontally(tween(300)) { -it } },
+                popEnterTransition = { slideInHorizontally(tween(300)) { -it } },
+                popExitTransition = { slideOutHorizontally(tween(300)) { it } }
+            ) {
                 EpisodesScreen(navController) { visible -> bottomBarVisible = visible }
             }
 
             composable(
                 route = Screen.EpisodeDetail.route,
-                arguments = listOf(navArgument("episodeId") { type = NavType.IntType })
+                arguments = listOf(navArgument("episodeId") { type = NavType.IntType }),
+                enterTransition = { slideInVertically(tween(300)) { it } },
+                exitTransition = { slideOutVertically(tween(300)) { -it } },
+                popEnterTransition = { slideInVertically(tween(300)) { -it } },
+                popExitTransition = { slideOutVertically(tween(300)) { it } }
             ) { backStackEntry ->
                 val id = backStackEntry.arguments?.getInt("episodeId") ?: 0
                 EpisodeDetailScreen(navController, id)
             }
 
-            composable(Screen.Locations.route) {
+            composable(
+                route = Screen.Locations.route,
+                enterTransition = { slideInHorizontally(tween(300)) { it } },
+                exitTransition = { slideOutHorizontally(tween(300)) { -it } },
+                popEnterTransition = { slideInHorizontally(tween(300)) { -it } },
+                popExitTransition = { slideOutHorizontally(tween(300)) { it } }
+            ) {
                 LocationsScreen(navController) { visible -> bottomBarVisible = visible }
             }
 
             composable(
                 route = Screen.LocationDetail.route,
-                arguments = listOf(navArgument("locationId") { type = NavType.IntType })
+                arguments = listOf(navArgument("locationId") { type = NavType.IntType }),
+                enterTransition = { slideInVertically(tween(300)) { it } },
+                exitTransition = { slideOutVertically(tween(300)) { -it } },
+                popEnterTransition = { slideInVertically(tween(300)) { -it } },
+                popExitTransition = { slideOutVertically(tween(300)) { it } }
             ) { backStackEntry ->
                 val id = backStackEntry.arguments?.getInt("locationId") ?: 0
                 LocationDetailScreen(navController, id)
+            }
+
+            composable(Screen.Favorites.route) {
+                FavoritesScreen(navController)
             }
         }
     }

@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.model.Location
 import com.example.rickandmorty.repository.LocationRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LocationViewModel(private val repo: LocationRepository): ViewModel() {
     private val _locations = MutableStateFlow<List<Location>>(emptyList())
@@ -16,15 +18,20 @@ class LocationViewModel(private val repo: LocationRepository): ViewModel() {
     val locationDetail: StateFlow<Location?> = _locationDetail
 
     fun fetchLocations() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val response = repo.getLocations()
-            _locations.value = response.results
+            withContext(Dispatchers.Main) {
+                _locations.value = response.results
+            }
         }
     }
 
     fun fetchLocationDetail(id: Int) {
-        viewModelScope.launch {
-            _locationDetail.value = repo.getLocationById(id)
-        }
+        viewModelScope.launch(Dispatchers.IO) {
+            val character = repo.getLocationById(id)
+            withContext(Dispatchers.Main) {
+                _locationDetail.value = character
+            }
     }
+}
 }
