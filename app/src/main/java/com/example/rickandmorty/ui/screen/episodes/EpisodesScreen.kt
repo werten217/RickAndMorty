@@ -46,11 +46,12 @@ fun EpisodesScreen(
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = {
             isRefreshing = true
-            viewModel.fetchEpisodes()
-            isRefreshing = false
+            viewModel.refreshEpisodes {
+                isRefreshing = false
+            }
         }
     ) {
-        if (episodes.isEmpty()) {
+        if (episodes.isEmpty() && !isRefreshing) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }

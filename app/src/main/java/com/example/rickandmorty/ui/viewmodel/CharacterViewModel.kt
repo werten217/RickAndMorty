@@ -5,37 +5,36 @@ import androidx.lifecycle.viewModelScope
 import com.example.rickandmorty.model.Character
 import com.example.rickandmorty.repository.CharacterRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class CharacterViewModel(private val repo: CharacterRepository) : ViewModel() {
 
+    private val _characters = MutableStateFlow<List<Character>>(emptyList())
+    val characters: StateFlow<List<Character>> = _characters
 
-    val characters: StateFlow<List<Character>> =
-        flow {
-            val response = repo.getCharacters()
-            emit(response.results)
+    init {
+        refreshCharacters()
+    }
+
+    fun refreshCharacters(onComplete: (() -> Unit)? = null) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repo.getCharacters()
+                _characters.emit(response.results)
+            } finally {
+                onComplete?.invoke()
+            }
         }
-            .flowOn(Dispatchers.IO) // Запуск в фоне
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Lazily,
-                initialValue = emptyList()
-            )
+    }
 
-    // Детали персонажа как Flow
-    fun getCharacterDetail(id: Int): StateFlow<Character?> =
-        flow {
+    fun getCharacterDetail(id: Int): StateFlow<Character?> {
+        val flow = MutableStateFlow<Character?>(null)
+        viewModelScope.launch(Dispatchers.IO) {
             val character = repo.getCharacterById(id)
-            emit(character)
+            flow.emit(character)
         }
-            .flowOn(Dispatchers.IO)
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Lazily,
-                initialValue = null
-            )
+        return flow
+    }
 }

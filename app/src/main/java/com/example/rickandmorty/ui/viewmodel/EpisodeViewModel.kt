@@ -21,16 +21,29 @@ class EpisodeViewModel(private val repo: EpisodeRepository): ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val response = repo.getEpisodes()
             withContext(Dispatchers.Main) {
-            _episodes.value = response.results
+                _episodes.value = response.results
+            }
         }
-    }
     }
 
     fun fetchEpisodeDetail(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val character = repo.getEpisodeById(id)
+            val episode = repo.getEpisodeById(id)
             withContext(Dispatchers.Main) {
-                _episodeDetail.value = character
+                _episodeDetail.value = episode
+            }
+        }
+    }
+
+    fun refreshEpisodes(onComplete: (() -> Unit)? = null) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repo.getEpisodes()
+                withContext(Dispatchers.Main) {
+                    _episodes.value = response.results
+                }
+            } finally {
+                onComplete?.invoke()
             }
         }
     }

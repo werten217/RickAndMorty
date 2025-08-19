@@ -28,10 +28,23 @@ class LocationViewModel(private val repo: LocationRepository): ViewModel() {
 
     fun fetchLocationDetail(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val character = repo.getLocationById(id)
+            val location = repo.getLocationById(id)
             withContext(Dispatchers.Main) {
-                _locationDetail.value = character
+                _locationDetail.value = location
             }
+        }
     }
-}
+
+    fun refreshLocations(onComplete: (() -> Unit)? = null) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repo.getLocations()
+                withContext(Dispatchers.Main) {
+                    _locations.value = response.results
+                }
+            } finally {
+                onComplete?.invoke()
+            }
+        }
+    }
 }

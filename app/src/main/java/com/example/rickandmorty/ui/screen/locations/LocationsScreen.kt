@@ -46,11 +46,12 @@ fun LocationsScreen(
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = {
             isRefreshing = true
-            viewModel.fetchLocations()
-            isRefreshing = false
+            viewModel.refreshLocations {
+                isRefreshing = false
+            }
         }
     ) {
-        if (locations.isEmpty()) {
+        if (locations.isEmpty() && !isRefreshing) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }

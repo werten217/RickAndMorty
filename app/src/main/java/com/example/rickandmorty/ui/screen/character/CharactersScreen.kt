@@ -28,7 +28,6 @@ import com.example.rickandmorty.data.model.FavoriteCharacter
 import com.example.rickandmorty.ui.viewmodel.FavoriteViewModel
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharactersScreen(
@@ -37,6 +36,7 @@ fun CharactersScreen(
     onBottomBarVisibilityChanged: (Boolean) -> Unit = {}
 ) {
     val characters by characterViewModel.characters.collectAsState()
+    var isRefreshing by remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
     var previousIndex by remember { mutableStateOf(0) }
@@ -71,19 +71,29 @@ fun CharactersScreen(
             }
         }
 
-        if (characters.isEmpty()) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(isRefreshing),
+            onRefresh = {
+                isRefreshing = true
+                characterViewModel.refreshCharacters {
+                    isRefreshing = false
+                }
             }
-        } else {
-            LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
-                items(characters) { character ->
-                    CharacterItem(
-                        character = character,
-                        onClick = {
-                            navController.navigate(Screen.CharacterDetail.createRoute(character.id))
-                        }
-                    )
+        ) {
+            if (characters.isEmpty() && !isRefreshing) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+                    items(characters) { character ->
+                        CharacterItem(
+                            character = character,
+                            onClick = {
+                                navController.navigate(Screen.CharacterDetail.createRoute(character.id))
+                            }
+                        )
+                    }
                 }
             }
         }
